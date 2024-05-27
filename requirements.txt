@@ -1,0 +1,7 @@
+packaging==24.0
+timm==0.4.12
+transformers==4.35.2
+yacs==0.1.8 
+fvcore==0.1.5.post20221221
+scikit-image==0.22.0
+pycocotools==2.0.7
