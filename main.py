@@ -13,6 +13,7 @@ from timm.scheduler import create_scheduler
 from timm.utils import ModelEma, NativeScaler, get_state_dict
 
 import model.conv_segmenter
+import model.mamba_segmenter
 import utils as utils
 from engine import evaluate, train_one_epoch
 from model.utils import create_optimizer
@@ -25,7 +26,7 @@ def get_args_parser():
     parser.add_argument('--epochs', default=50, type=int)
 
     # Model parameters
-    parser.add_argument('--model', default='ReMamber_Conv', type=str, metavar='MODEL',
+    parser.add_argument('--model', default='ReMamber_Conv', type=str, metavar='MODEL', choices=['ReMamber_Conv', 'ReMamber_Mamba'],
                         help='Name of model to train')
     parser.add_argument('--pretrain-path', default='./pretrain', type=str)
     parser.add_argument('--input-size', default=480, type=int, help='images input size')

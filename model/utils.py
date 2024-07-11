@@ -99,6 +99,37 @@ class ImageTextCorr(nn.Module):
         out = self.out_proj(feat)
         return out
 
+
+def conv_layer(in_dim, out_dim, kernel_size=1, padding=0, stride=1):
+    return nn.Sequential(
+        nn.Conv2d(in_dim, out_dim, kernel_size, stride, padding, bias=False),
+        nn.BatchNorm2d(out_dim), nn.ReLU(True))
+
+
+class Fusion(nn.Module):
+    def __init__(self, in_dim_1, in_dim_2, out_dim, bias=False) -> None:
+        super().__init__()
+
+        self.fusion = nn.Sequential(
+            nn.Conv2d(in_dim_1+in_dim_2, out_dim, 3, padding=1, bias=bias),
+            nn.BatchNorm2d(out_dim),
+            nn.ReLU(),
+            nn.Conv2d(out_dim, out_dim, 3, padding=1, bias=bias),
+            nn.BatchNorm2d(out_dim),
+            nn.ReLU(),
+        )
+
+    def forward(self, in_1, in_2):
+        if in_1.shape[-1] < in_2.shape[-1]:
+            in_1 = F.interpolate(in_1, size=in_2.shape[-2:], mode='bilinear', align_corners=True)
+        elif in_1.shape[-1] > in_2.shape[-1]:
+            in_2 = F.interpolate(in_2, size=in_1.shape[-2:], mode='bilinear', align_corners=True)
+
+        x = torch.cat((in_1, in_2), dim=1)
+        x = self.fusion(x)
+        return x
+
+
 def create_optimizer(args, model:nn.Module, new_param):
     all_param = model.named_parameters()
     text_backbone = []
